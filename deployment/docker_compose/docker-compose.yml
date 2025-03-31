@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: bitly_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bitly_user
+      POSTGRES_PASSWORD: bitly_password
+      POSTGRES_DB: bitly_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bitly_network
+
+  backend:
+    build:
+      context: ../../  # Adjusted to match the backend root
+      dockerfile: deployment/docker_compose/Dockerfile
+    container_name: bitly_backend
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://bitly_user:bitly_password@postgres:5432/bitly_db
+    volumes:
+      - ../../backend:/app
+    ports:
+      - "8000:8000"
+    networks:
+      - bitly_network
+    command: >
+      sh -c "alembic upgrade head && uvicorn bitly.server.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  postgres_data:
+
+networks:
+  bitly_network:
