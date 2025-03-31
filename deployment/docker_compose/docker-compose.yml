@@ -18,7 +18,7 @@ services:
 
   backend:
     build:
-      context: ../../  # Adjusted to match the backend root
+      context: ../../  # Points to project root
       dockerfile: deployment/docker_compose/Dockerfile
     container_name: bitly_backend
     depends_on:
@@ -33,6 +33,24 @@ services:
       - bitly_network
     command: >
       sh -c "alembic upgrade head && uvicorn bitly.server.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  write_service:
+    build:
+      context: ../../
+      dockerfile: deployment/docker_compose/Dockerfile
+    container_name: bitly_write_service
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://bitly_user:bitly_password@postgres:5432/bitly_db
+    volumes:
+      - ../../backend:/app
+    ports:
+      - "8001:8001"
+    networks:
+      - bitly_network
+    command: >
+      sh -c "uvicorn bitly.server.write_service.api:app --host 0.0.0.0 --port 8001 --reload"
 
 volumes:
   postgres_data:

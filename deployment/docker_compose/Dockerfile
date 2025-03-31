@@ -11,5 +11,5 @@ COPY backend/ /app
 RUN pip install --upgrade pip && \
     pip install -r requirements/default.txt
 
-# Run the application
-CMD ["uvicorn", "bitly.server.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Expose ports for both services
+EXPOSE 8000 8001
