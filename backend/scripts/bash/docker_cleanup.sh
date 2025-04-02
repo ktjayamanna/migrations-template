@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# Warn the user before proceeding
-echo "WARNING: This script will remove all Docker containers, images, volumes, and networks from your system."
-echo "Are you sure you want to proceed? (yes/no)"
-read confirmation
-
-if [ "$confirmation" != "yes" ]; then
-    echo "Operation aborted."
-    exit 1
-fi
-
 # Stop all running containers
 echo "Stopping all running containers..."
 docker stop $(docker ps -q) 2>/dev/null
@@ -34,7 +24,7 @@ docker network rm $(docker network ls -q) 2>/dev/null
 echo "Pruning system..."
 docker system prune -a --volumes -f
 
-# Optionally, remove Docker's storage directory
+# Remove Docker storage directories
 echo "Removing Docker storage directories..."
 sudo rm -rf /var/lib/docker /var/lib/containerd
 
