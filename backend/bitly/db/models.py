@@ -10,6 +10,7 @@ class User(Base):
     user_name = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=True)
     phone_number = Column(String, unique=True, nullable=True)
+    age = Column(Integer, nullable=True)
 
     urls = relationship("Url", back_populates="owner")
 
