@@ -15,24 +15,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - bitly_network
-
-  backend:
-    build:
-      context: ../../  # Points to project root
-      dockerfile: deployment/docker_compose/Dockerfile
-    container_name: bitly_backend
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: postgresql://bitly_user:bitly_password@postgres:5432/bitly_db
-    volumes:
-      - ../../backend:/app
-    ports:
-      - "8000:8000"
-    networks:
-      - bitly_network
-    command: >
-      sh -c "alembic upgrade head && uvicorn bitly.server.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bitly_user -d bitly_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   write_service:
     build:
@@ -40,17 +27,22 @@ services:
       dockerfile: deployment/docker_compose/Dockerfile
     container_name: bitly_write_service
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://bitly_user:bitly_password@postgres:5432/bitly_db
+      PYTHONPATH: /app
     volumes:
       - ../../backend:/app
     ports:
-      - "8001:8001"
+      - "8000:8000"  # Changed from 8001 to 8000 since this is our main service
     networks:
       - bitly_network
     command: >
-      sh -c "uvicorn bitly.server.write_service.api:app --host 0.0.0.0 --port 8001 --reload"
+      sh -c "
+        cd /app &&
+        alembic upgrade head &&
+        uvicorn bitly.server.write_service.api:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
   postgres_data:
