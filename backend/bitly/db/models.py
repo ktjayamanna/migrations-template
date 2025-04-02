@@ -8,6 +8,8 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True, index=True)
     user_name = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=True)
+    phone_number = Column(String, unique=True, nullable=True)
 
     urls = relationship("Url", back_populates="owner")
 
