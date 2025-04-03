@@ -19,4 +19,5 @@ This project is a template for building a web application using FastAPI, SQLAlch
 5. Run the application with `uvicorn bitly.server.write_service.api:app --host 0.0.0.0 --port 8000 --reload`.
 6. Open your web browser and navigate to `http://localhost:8000/docs` to access the API documentation.
 
-## Please note that this repository contains code snippets from an external source (https://github.com/ktjayamanna/bitly-system-design-implementation) that should be removed before use.
+## Please note:
+This repository contains code snippets from an external source `https://github.com/ktjayamanna/bitly-system-design-implementation` that should be removed before use.
